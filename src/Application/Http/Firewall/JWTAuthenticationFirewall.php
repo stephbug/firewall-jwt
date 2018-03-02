@@ -11,6 +11,7 @@ use StephBug\SecurityModel\Application\Http\Entrypoint\Entrypoint;
 use StephBug\SecurityModel\Application\Http\Firewall\AuthenticationFirewall;
 use StephBug\SecurityModel\Application\Http\Request\AuthenticationRequest;
 use StephBug\SecurityModel\Application\Values\NullIdentifier;
+use StephBug\SecurityModel\Application\Values\SecurityKey;
 use StephBug\SecurityModel\Guard\Authentication\Token\Tokenable;
 use StephBug\SecurityModel\Guard\Guard;
 use StephBug\SecurityModel\User\Exception\BadCredentials;
@@ -33,11 +34,20 @@ class JWTAuthenticationFirewall extends AuthenticationFirewall
      */
     private $authenticationRequest;
 
-    public function __construct(Guard $guard, Entrypoint $entrypoint, AuthenticationRequest $authenticationRequest)
+    /**
+     * @var SecurityKey
+     */
+    private $securityKey;
+
+    public function __construct(Guard $guard,
+                                Entrypoint $entrypoint,
+                                AuthenticationRequest $authenticationRequest,
+                                SecurityKey $securityKey)
     {
         $this->guard = $guard;
         $this->entrypoint = $entrypoint;
         $this->authenticationRequest = $authenticationRequest;
+        $this->securityKey = $securityKey;
     }
 
     protected function processAuthentication(Request $request): ?Response
@@ -66,6 +76,6 @@ class JWTAuthenticationFirewall extends AuthenticationFirewall
             throw BadCredentials::invalid();
         }
 
-        return new JWTToken(new NullIdentifier(), $credential);
+        return new JWTToken(new NullIdentifier(), $credential, $this->securityKey);
     }
 }
