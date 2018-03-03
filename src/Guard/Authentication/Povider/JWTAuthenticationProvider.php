@@ -54,7 +54,7 @@ class JWTAuthenticationProvider implements AuthenticationProvider
 
         $user = $this->userProvider->requireByIdentifier($jwtToken->getIdentifier());
 
-        return new JWTToken($user, $tokenString, $this->securityKey);
+        return new JWTToken($user, $tokenString, $this->securityKey, $user->getRoles());
     }
 
     public function supports(Tokenable $token): bool
